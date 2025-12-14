@@ -1,0 +1,17 @@
+[project]
+name = "aidi1000-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]>=0.124.0",
+    "matplotlib>=3.10.7",
+    "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "pydantic>=2.12.5",
+    "scikit-learn>=1.7.2",
+    "seaborn>=0.13.2",
+    "uvicorn[standard]>=0.38.0",
+    "xgboost>=3.1.2",
+]
