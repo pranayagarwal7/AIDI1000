@@ -1,53 +1,71 @@
-# Penguin Species Predictor
+# AIDI 1000 Final Project - Penguin Species Predictor
 
-A complete machine learning project predicting penguin (seaborn dataset) species from body measurements using scikit-learn, with a FastAPI REST endpoint for predictions.
+## How to Run
 
-## 📋 Project Structure
+1. Install uv (once per computer)
 
-aidi1000-project/
-├── penguin_model.pkl # Trained ML model (Pipeline)
-├── main.py # FastAPI app
-├── notebooks/ # Jupyter notebooks for training
-│ └── penguin_analysis.ipynb
-├── data/ # Raw penguin data (optional)
-└── README.md # This file
+```powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"```
 
+Restart PowerShell → run ```uv --version```
 
-## 🐧 Dataset
+2. Install Python 3.10.16
 
-Palmer Penguins dataset with features:
-- Numeric: `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, `body_mass_g`
-- Categorical: `island` (Torgersen, Biscoe, Dream), `sex` (MALE, FEMALE)
-- Target: `species` (Adelie, Chinstrap, Gentoo)
+```uv python install 3.10.16```
+3. Create your project
 
-## 🚀 Quick Start
+```mkdir fastapi-project && cd fastapi-project```
+```uv init```
+```uv python pin 3.10.16```
+```uv venv```
+```.venv\Scripts\Scripts\Activate.ps1```
 
-### 1. Install dependencies
-pip install fastapi uvicorn pandas scikit-learn seaborn matplotlib
+4. Install dependencies
 
-### 2. Run FastAPI server
-uvicorn main:app --reload
+```uv add numpy pandas pydantic scikit-learn seaborn fastapi "uvicorn[standard]"```
 
-### 3. Test the API
-Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interactive Swagger UI
+5. Run the app
 
-## 🔬 ML Pipeline
-**Preprocessing** (applied automatically by model):
-Numeric columns → StandardScaler
-Categorical → OneHotEncoder
-All features → RandomForestClassifier 
+```uv run fastapi dev main.py```
+→ http://127.0.0.1:8000  Interactive docs: http://127.0.0.1:8000/docs
 
 
-**Model Evaluation** (example results):
+## Dataset Used
 
-| Metric      | Train | Test  | Overfitting? |
-|-------------|-------|-------|--------------|
-| F1-score    | 0.95  | 0.82  | Yes (gap)    |
-| ROC-AUC     | 0.98  | 0.89  | Yes (gap)    |
+**Palmer Penguins Dataset** (344 samples after cleaning)
 
-**Overfitting Assessment**: Large gap between train/test scores indicates overfitting. Model memorizes training patterns but generalizes less well to unseen data.
+| Feature | Type | Values |
+|---------|------|--------|
+| `bill_length_mm` | Numeric | 32-60 mm |
+| `bill_depth_mm` | Numeric | 13-22 mm |
+| `flipper_length_mm` | Numeric | 172-231 mm |
+| `body_mass_g` | Numeric | 2850-6300 g |
+| `island` | Categorical | Torgersen, Biscoe, Dream |
+| `sex` | Categorical | MALE, FEMALE |
+| **`species`** | **Target** | Adelie, Chinstrap, Gentoo |
 
-## 📊 API Endpoints
+**Preprocessing**: `dropna()` → `ColumnTransformer(StandardScaler + OneHotEncoder)`
 
-### `POST /predict`
-**Input schema**:
+## Model Chosen
+
+**RandomForestClassifier(random_state=42)**
+- Default hyperparameters (no tuning)
+- All 7 features used (no selection/engineering)
+- Pipeline: `preprocess → model`
+- Saved as `penguin_model.pkl`
+
+## Evaluation Metrics
+
+| Metric | Train | Test | Gap |
+|--------|-------|------|-----|
+| **F1-Score (macro)** | **1.00** | **1.00** | **0.00** |
+| **ROC-AUC (ovr, macro)** | **1.00** | **1.00** | **0.00** |
+
+## Overfitting Assessment
+
+**Model shows perfect performance (potential overfitting)**
+
+**Evidence**: 
+- Perfect F1-score (1.00 = 1.00)
+- Perfect ROC-AUC (1.00 = 1.00)
+
+**Explanation**: Perfect scores on both train and test suggest the model may be overfitting by memorizing the small dataset (344 samples). While train/test match indicates good generalization, perfect 1.00 scores are suspicious for real-world data and warrant caution. Consider collecting more data or adding regularization.
